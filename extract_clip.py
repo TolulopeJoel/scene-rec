@@ -20,7 +20,7 @@ def extract_video_subclip(movie_name: str, start_time_str: str, end_time_str: st
     movie_file = None
 
     # Search for the file in the current directory
-    for filename in os.listdir('.'):
+    for filename in os.listdir('./movies'):
         if pattern.match(filename):
             movie_file = filename
             break
@@ -29,7 +29,7 @@ def extract_video_subclip(movie_name: str, start_time_str: str, end_time_str: st
     if movie_file:
         # Create a new filename with .mp4 extension
         mp4_filename = os.path.splitext(movie_file)[0] + '_awade_.mp4'
-        original_clip = VideoFileClip(movie_file)
+        original_clip = VideoFileClip("./movies/" + movie_file)
         subclip = original_clip.subclip(start, end)
         subclip.write_videofile(mp4_filename, codec="libx264")
 
@@ -39,4 +39,3 @@ def extract_video_subclip(movie_name: str, start_time_str: str, end_time_str: st
     #     end_time,
     #     targetname=f"{movie_name}_awade.mp4"
     # )
-
