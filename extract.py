@@ -1,10 +1,32 @@
 import json
+import re
+import string
 from pathlib import Path
 
-JSON_SUBS_DIR = Path("subs/json")
-ORIGINAL_SUBS_DIR = Path("subs/originals")
-EXTRACTED_SUBS_DIR = Path("subs/extracted")
-JSON_FILE = JSON_SUBS_DIR / "1.json"
+from constants import (
+    ABBREVIATIONS, JSON_FILE,
+    EXTRACTED_SUBS_DIR, JSON_SUBS_DIR,
+    ORIGINAL_SUBS_DIR
+)
+
+
+def clean_text(text: str) -> str:
+    """Apply all text cleaning functions to the given text."""
+    def remove_html_elements(text: str) -> str:
+        return re.sub(r'<[^>]+>', '', text)
+
+    def expand_abbreviations(text: str) -> str:
+        words = text.lower().split()
+        expanded_words = [ABBREVIATIONS.get(word, word) for word in words]
+        return ' '.join(expanded_words)
+
+    def remove_punctuation(text: str) -> str:
+        return text.translate(str.maketrans('', '', string.punctuation))
+
+    text = remove_html_elements(text)
+    text = expand_abbreviations(text)
+    text = remove_punctuation(text)
+    return text
 
 
 def remove_cue_numbers(input_file: Path, output_file: Path):
@@ -17,57 +39,46 @@ def remove_cue_numbers(input_file: Path, output_file: Path):
 
 
 def srt_to_json(srt_file_path, json_file_path):
+    def add_subtitle(data, temp_dict, subtitle_lines):
+        if subtitle_lines:
+            temp_dict['text'] = clean_text(' '.join(subtitle_lines))
+            data.append(temp_dict)
+
     with open(srt_file_path, 'r', encoding='utf-8') as srt_file:
         data = []
         lines = srt_file.readlines()
         temp_dict = {}
         subtitle_lines = []
-
         for line in lines:
             line = line.strip()
 
             if line.isdigit():
-                continue  # Skip subtitle index
+                # Skip the subtitle index (cue number) lines
+                continue
 
             elif '-->' in line:
-                if temp_dict:
-                    # Determine if the subtitle is multi-line
-                    if len(subtitle_lines) > 1:
-                        temp_dict['text'] = {
-                            f"line_{i+1}": text for i, text in enumerate(subtitle_lines)}
-                    else:
-                        temp_dict['text'] = subtitle_lines[0]
-                    data.append(temp_dict)
-                    temp_dict = {}
-                    subtitle_lines = []
+                # When a timestamp line is encountered, it means the previous subtitle has ended
+                # Add the previous subtitle to the data list
+                add_subtitle(data, temp_dict, subtitle_lines)
+                temp_dict = {}
+                subtitle_lines = []
 
                 times = line.split(' --> ')
                 temp_dict['start'] = times[0].strip()
                 temp_dict['end'] = times[1].strip()
 
             elif line == '':
-                if temp_dict:
-                    # Determine if the subtitle is multi-line
-                    if len(subtitle_lines) > 1:
-                        temp_dict['text'] = {
-                            f"line_{i+1}": text for i, text in enumerate(subtitle_lines)}
-                    else:
-                        temp_dict['text'] = subtitle_lines[0]
-                    data.append(temp_dict)
-                    temp_dict = {}
-                    subtitle_lines = []
+                # An empty line indicates the end of a subtitle block
+                # Add the current subtitle to the data list
+                add_subtitle(data, temp_dict, subtitle_lines)
+                temp_dict = {}
+                subtitle_lines = []
 
             else:
-                subtitle_lines.append(line)
+                subtitle_lines.append(clean_text(line))
 
-        # Add the last subtitle if not already added
-        if temp_dict:
-            if len(subtitle_lines) > 1:
-                temp_dict['text'] = {
-                    f"line_{i+1}": text for i, text in enumerate(subtitle_lines)}
-            else:
-                temp_dict['text'] = subtitle_lines[0]
-            data.append(temp_dict)
+        # After the loop, add the last subtitle if it hasn't been added yet
+        add_subtitle(data, temp_dict, subtitle_lines)
 
     with open(json_file_path, 'w', encoding='utf-8') as json_file:
         json.dump(data, json_file, ensure_ascii=False, indent=4)
@@ -85,7 +96,6 @@ def consolidate_json_and_cleanup():
     else:
         main_data = {}
 
-    # Process other JSON files
     for json_file in JSON_SUBS_DIR.glob("*.json"):
         if json_file != JSON_FILE:
             movie_name = json_file.stem  # Get filename without extension
@@ -117,3 +127,7 @@ def process_subtitle_files():
             srt_to_json(extracted_file, json_file)
 
     consolidate_json_and_cleanup()
+
+
+if __name__ == '__main__':
+    process_subtitle_files()
