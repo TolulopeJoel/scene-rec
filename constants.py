@@ -1,9 +1,14 @@
+import os
 from pathlib import Path
 
-JSON_SUBS_DIR = Path("./subs/json")
-ORIGINAL_SUBS_DIR = Path("./subs/originals")
-EXTRACTED_SUBS_DIR = Path("./subs/extracted")
-JSON_FILE = JSON_SUBS_DIR / "1.json"
+from dotenv import load_dotenv
+
+load_dotenv()
+
+JSON_SUBS_DIR = Path("./media/subs/json")
+ORIGINAL_SUBS_DIR = Path("./media/subs/originals")
+EXTRACTED_SUBS_DIR = Path("./media/subs/extracted")
+JSON_FILE = JSON_SUBS_DIR / "db.json"
 
 ABBREVIATIONS = {
     "i'll": "i will",
@@ -65,7 +70,7 @@ ABBREVIATIONS = {
     "c'mon": "come on",
     "lotta": "lot of",
     "dunno": "do not know",
-    "ain't": "is not",
+    "ain't": "aint",
     "y'know": "you know",
     "watcha": "what are you",
     "d'you": "do you",
@@ -133,3 +138,30 @@ ABBREVIATIONS = {
     "mightn't've": "might not have",
     "mustn't've": "must not have",
 }
+
+# SCRAPING DEETS
+ADDICTIVE_HEADERS = {
+    'User-Agent': os.getenv('ADDICTIVE_USER_AGENT'),
+    'Accept': os.getenv('ADDICTIVE_ACCEPT'),
+    'Accept-Language': os.getenv('ADDICTIVE_ACCEPT_LANGUAGE'),
+    'Accept-Encoding': os.getenv('ADDICTIVE_ACCEPT_ENCODING'),
+    'Connection': os.getenv('ADDICTIVE_CONNECTION'),
+    'Upgrade-Insecure-Requests': os.getenv('ADDICTIVE_UPGRADE_INSECURE_REQUESTS'),
+    'Sec-Fetch-Dest': os.getenv('ADDICTIVE_SEC_FETCH_DEST'),
+    'Sec-Fetch-Mode': os.getenv('ADDICTIVE_SEC_FETCH_MODE'),
+    'Sec-Fetch-Site': os.getenv('ADDICTIVE_SEC_FETCH_SITE'),
+    'Priority': os.getenv('ADDICTIVE_PRIORITY'),
+    'TE': os.getenv('ADDICTIVE_TE')
+}
+ADDICTIVE_COOKIES = {
+    '__utma': os.getenv('ADDICTIVE__UTMA'),
+    '__utmz': os.getenv('ADDICTIVE__UTMZ'),
+    'wikisubtitlesuser': os.getenv('ADDICTIVE_WIKISUBTITLESUSER'),
+    'wikisubtitlespass': os.getenv('ADDICTIVE_WIKISUBTITLESPASS'),
+    'PHPSESSID': os.getenv('ADDICTIVE_PHPSESSID'),
+    '__utmb': os.getenv('ADDICTIVE__UTMB'),
+    '__utmc': os.getenv('ADDICTIVE__UTMC'),
+    '__utmt': os.getenv('ADDICTIVE__UTMT'),
+    'xpMenuCookv2': os.getenv('ADDICTIVE_XP_MENU_COOKV2')
+}
+ADDICTIVE_BASE_URL = os.getenv('ADDICTIVE_BASE_URL')
