@@ -1,98 +1,61 @@
-"""
-Match user input to subtitles and return the movie info
-"""
+# TODO: expand `get_best_match` function to give user's options to choose from (simple fix)
+# TODO: implement function to split user input to phrases and iterate till all matches are found.
 
-import json
-from pathlib import Path
+import sqlite3
 
+from fuzzywuzzy import process
 
-def flatten_subtitle_text(text):
-    if isinstance(text, dict):
-        return ' '.join(text.values())
-    return text
+from utilities import rinse_text
 
 
-def jaccard_similarity(str1, str2):
-    set1 = set(str1.split())
-    set2 = set(str2.split())
-    intersection = set1.intersection(set2)
-    union = set1.union(set2)
-    return len(intersection) / len(union) if union else 0
+def get_movie_details(result, cursor, matched_text):
+    movie_id = result[1]
+
+    movie_query = "SELECT name FROM movies WHERE id = ?"
+    cursor.execute(movie_query, (movie_id,))
+    movie_name = cursor.fetchone()[0]
+
+    sub_query = "SELECT text, start, end FROM subtitles WHERE movie_id = ? AND text = ?"
+    cursor.execute(sub_query, (movie_id, matched_text))
+    movie_text, sub_start, sub_end = cursor.fetchone()
+
+    return matched_text, movie_name, movie_text, sub_start, sub_end
 
 
-def find_best_match(user_input, subtitles_data):
-    matches = []
-    for movie, subtitles in subtitles_data.items():
-        for subtitle in subtitles:
-            subtitle_text = flatten_subtitle_text(subtitle['text'])
-            if "♪" not in subtitle_text:  # Exclude subtitles with musical notes
-                similarity = jaccard_similarity(
-                    user_input.lower(), subtitle_text.lower())
-                if similarity > 0:
-                    matches.append({
-                        'movie': movie,
-                        'text': subtitle_text,
-                        'start': subtitle['start'],
-                        'end': subtitle['end'],
-                        'similarity': similarity,
-                        'phrase': user_input
-                    })
-    if matches:
-        # Sort matches based on the similarity score
-        sorted_matches = sorted(
-            matches, key=lambda x: x['similarity'], reverse=True)
-        # Return the best match and all matches for further use
-        return sorted_matches[0], sorted_matches
-    return None, None  # Will be None if no matches found
+def get_best_match(cursor, user_input):
+    """Find the best matching subtitle for the given user input."""
+    rinsed_text = rinse_text(user_input)
+
+    search_query = "SELECT text, movie_id FROM subtitles_fts WHERE text MATCH ?"
+    cursor.execute(search_query, (rinsed_text,))
+
+    if results := cursor.fetchall():
+        subtitles = [result[0] for result in results]
+
+        if best_matches := process.extractBests(rinsed_text, subtitles):
+            matched_text = best_matches[0][0]
+            for result in results:
+                if result[0] == matched_text:
+                    return get_movie_details(result, cursor, matched_text)
+    return (None, None, None, None, None)
 
 
-def find_remaining_phrases(user_input, subtitles_data):
-    original_input = user_input.lower().split()
-    found_phrases = []
-    matched_texts = set()
-    while len(original_input) > 1:  # Ensure we have at least two words to form a phrase
-        current_input = ' '.join(original_input)
-        match, _ = find_best_match(current_input, subtitles_data)
-        if match and match['text'] not in matched_texts:
-            found_phrases.append(match)
-            matched_texts.add(match['text'])
-            # Remove matched words from the original input
-            matched_words = set(match['text'].lower().split())
-            original_input = [
-                word for word in original_input if word not in matched_words]
-        else:
-            # Remove the last word to try to match the remaining phrase
-            original_input.pop()
-    return found_phrases
+def main():
+    conn = sqlite3.connect("./subtitles.db")
+    cursor = conn.cursor()
+
+    user_input = input("write... ")
+    best_text, movie_name, _, start, end = get_best_match(cursor, user_input)
+
+    if best_text:
+        print(f"Best matching text: {best_text}")
+        print(f"Movie name: {movie_name}")
+        print(f"Timestamp: {start} --> {end}")
+    else:
+        print("No matching subtitle found.")
+
+    conn.close()
 
 
-def sort_matches_by_input_order(matches, user_input):
-    input_words = user_input.split()
-    input_phrases = [' '.join(input_words[i:j]) for i in range(
-        len(input_words)) for j in range(i+2, len(input_words)+1)]
-    sorted_matches = []
-    for phrase in input_phrases:
-        for match in matches:
-            if phrase in match['text'].lower() and match not in sorted_matches:
-                sorted_matches.append(match)
-                break
-    return sorted_matches
-
-
-def load_subtitles(json_file_path):
-    with json_file_path.open('r', encoding='utf-8') as file:
-        return json.load(file)
-
-
-def find_sorted_matching_phrases(user_input: int) -> dict:
-    JSON_FILE = Path("subs/json/1.json")
-    subtitles_data = load_subtitles(JSON_FILE)
-
-    matching_phrases = find_remaining_phrases(
-        user_input.lower(), subtitles_data)
-
-    if matching_phrases:
-        sorted_phrases = sort_matches_by_input_order(
-            matching_phrases, user_input.lower())
-        return sorted_phrases
-    return "No matching phrases found."
+if __name__ == "__main__":
+    main()
