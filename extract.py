@@ -1,4 +1,5 @@
 import json
+import os
 import re
 import string
 from pathlib import Path
@@ -13,15 +14,15 @@ from constants import (
 def clean_text(text: str) -> str:
     """Apply all text cleaning functions to the given text."""
     def remove_html_elements(text: str) -> str:
-        return re.sub(r'<[^>]+>', '', text)
+        return re.sub(r'<[^>]+>', "", text)
 
     def expand_abbreviations(text: str) -> str:
         words = text.lower().split()
         expanded_words = [ABBREVIATIONS.get(word, word) for word in words]
-        return ' '.join(expanded_words)
+        return " ".join(expanded_words)
 
     def remove_punctuation(text: str) -> str:
-        return text.translate(str.maketrans('', '', string.punctuation))
+        return text.translate(str.maketrans("", "", string.punctuation))
 
     text = remove_html_elements(text)
     text = expand_abbreviations(text)
@@ -29,22 +30,42 @@ def clean_text(text: str) -> str:
     return text
 
 
+def remove_file(file_path, downloaded_dict_path="./sources/downloaded.json"):
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        print(f"Deleted file: {file_path}")
+
+    # Update the sources/downloaded.json dictionary
+    with open(downloaded_dict_path, "r+", encoding="utf-8") as json_file:
+        downloaded_dict = json.load(json_file)
+        filename = os.path.basename(file_path).replace(".srt", "").replace(".json", "")
+        if filename in downloaded_dict:
+            del downloaded_dict[filename]
+            json_file.seek(0)
+            json.dump(downloaded_dict, json_file, ensure_ascii=False, indent=4)
+            json_file.truncate()
+            print(f"******* Removed {filename} from {downloaded_dict_path}")
+
+
 def remove_cue_numbers(input_file: Path, output_file: Path):
     """Remove cue numbers from subtitle file."""
-    with input_file.open("r", encoding="utf-8-sig") as infile, \
-            output_file.open("w", encoding="utf-8") as outfile:
-        for line in infile:
-            if not line.strip().isdigit():
-                outfile.write(line)
+    try:
+        with input_file.open("r", encoding="utf-8-sig", errors="replace") as infile, \
+                output_file.open("w", encoding="utf-8") as outfile:
+            for line in infile:
+                if not line.strip().isdigit():
+                    outfile.write(line)
+    except UnicodeDecodeError as e:
+        pass
 
 
 def srt_to_json(srt_file_path, json_file_path):
     def add_subtitle(data, temp_dict, subtitle_lines):
         if subtitle_lines:
-            temp_dict['text'] = clean_text(' '.join(subtitle_lines))
+            temp_dict["text"] = clean_text(" ".join(subtitle_lines))
             data.append(temp_dict)
 
-    with open(srt_file_path, 'r', encoding='utf-8') as srt_file:
+    with open(srt_file_path, "r", encoding="utf-8") as srt_file:
         data = []
         lines = srt_file.readlines()
         temp_dict = {}
@@ -56,18 +77,24 @@ def srt_to_json(srt_file_path, json_file_path):
                 # Skip the subtitle index (cue number) lines
                 continue
 
-            elif '-->' in line:
+            elif "-->" in line:
                 # When a timestamp line is encountered, it means the previous subtitle has ended
                 # Add the previous subtitle to the data list
-                add_subtitle(data, temp_dict, subtitle_lines)
-                temp_dict = {}
-                subtitle_lines = []
+                try:
+                    add_subtitle(data, temp_dict, subtitle_lines)
+                    temp_dict = {}
+                    subtitle_lines = []
 
-                times = line.split(' --> ')
-                temp_dict['start'] = times[0].strip()
-                temp_dict['end'] = times[1].strip()
+                    times = line.split(" --> ")
+                    temp_dict["start"] = times[0].strip()
+                    temp_dict["end"] = times[1].strip()
+                except IndexError:
+                    # files whose contents aren't SRTs (most times due to failed downloads)
+                    print(f"Error processing line in file: {srt_file_path}")
+                    remove_file(srt_file_path)
+                    return
 
-            elif line == '':
+            elif line == "":
                 # An empty line indicates the end of a subtitle block
                 # Add the current subtitle to the data list
                 add_subtitle(data, temp_dict, subtitle_lines)
@@ -77,11 +104,11 @@ def srt_to_json(srt_file_path, json_file_path):
             else:
                 subtitle_lines.append(clean_text(line))
 
-        # After the loop, add the last subtitle if it hasn't been added yet
         add_subtitle(data, temp_dict, subtitle_lines)
 
-    with open(json_file_path, 'w', encoding='utf-8') as json_file:
+    with open(json_file_path, "w", encoding="utf-8") as json_file:
         json.dump(data, json_file, ensure_ascii=False, indent=4)
+    print(f">>>>>>> Converted {srt_file_path} to JSON")
 
 
 def consolidate_json_and_cleanup():
@@ -89,7 +116,6 @@ def consolidate_json_and_cleanup():
     JSON_SUBS_DIR.mkdir(parents=True, exist_ok=True)
     EXTRACTED_SUBS_DIR.mkdir(parents=True, exist_ok=True)
 
-    # Read existing content of 1.json or create an empty dict if it doesn't exist
     if JSON_FILE.exists():
         with JSON_FILE.open("r", encoding="utf-8") as f:
             main_data = json.load(f)
@@ -122,12 +148,13 @@ def process_subtitle_files():
     for sub_file in ORIGINAL_SUBS_DIR.iterdir():
         if sub_file.is_file():
             extracted_file = EXTRACTED_SUBS_DIR / sub_file.name
-            json_file = JSON_SUBS_DIR / sub_file.with_suffix('.json').name
+            json_file = JSON_SUBS_DIR / sub_file.with_suffix(".json").name
             remove_cue_numbers(sub_file, extracted_file)
             srt_to_json(extracted_file, json_file)
 
     consolidate_json_and_cleanup()
+    print("Conversion done!")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     process_subtitle_files()
