@@ -1,33 +1,12 @@
 import json
 import os
-import re
-import string
 from pathlib import Path
 
 from constants import (
-    ABBREVIATIONS, JSON_FILE,
+    ORIGINAL_SUBS_DIR, JSON_FILE,
     EXTRACTED_SUBS_DIR, JSON_SUBS_DIR,
-    ORIGINAL_SUBS_DIR
 )
-
-
-def clean_text(text: str) -> str:
-    """Apply all text cleaning functions to the given text."""
-    def remove_html_elements(text: str) -> str:
-        return re.sub(r'<[^>]+>', "", text)
-
-    def expand_abbreviations(text: str) -> str:
-        words = text.lower().split()
-        expanded_words = [ABBREVIATIONS.get(word, word) for word in words]
-        return " ".join(expanded_words)
-
-    def remove_punctuation(text: str) -> str:
-        return text.translate(str.maketrans("", "", string.punctuation))
-
-    text = remove_html_elements(text)
-    text = expand_abbreviations(text)
-    text = remove_punctuation(text)
-    return text
+from utilities import rinse_text
 
 
 def remove_file(file_path, downloaded_dict_path="./sources/downloaded.json"):
@@ -62,7 +41,7 @@ def remove_cue_numbers(input_file: Path, output_file: Path):
 def srt_to_json(srt_file_path, json_file_path):
     def add_subtitle(data, temp_dict, subtitle_lines):
         if subtitle_lines:
-            temp_dict["text"] = clean_text(" ".join(subtitle_lines))
+            temp_dict["text"] = rinse_text(" ".join(subtitle_lines))
             data.append(temp_dict)
 
     with open(srt_file_path, "r", encoding="utf-8") as srt_file:
@@ -102,7 +81,7 @@ def srt_to_json(srt_file_path, json_file_path):
                 subtitle_lines = []
 
             else:
-                subtitle_lines.append(clean_text(line))
+                subtitle_lines.append(rinse_text(line))
 
         add_subtitle(data, temp_dict, subtitle_lines)
 
@@ -112,7 +91,7 @@ def srt_to_json(srt_file_path, json_file_path):
 
 
 def consolidate_json_and_cleanup():
-    """Consolidate JSON files into 1.json and clean up extracted subtitles."""
+    """Consolidate JSON files into db.json and clean up extracted subtitles."""
     JSON_SUBS_DIR.mkdir(parents=True, exist_ok=True)
     EXTRACTED_SUBS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -135,7 +114,7 @@ def consolidate_json_and_cleanup():
     for extracted_file in EXTRACTED_SUBS_DIR.iterdir():
         extracted_file.unlink()
 
-    # Write updated data back to 1.json
+    # Write updated data back to db.json
     with JSON_FILE.open("w", encoding="utf-8") as f:
         json.dump(main_data, f, indent=4)
 
