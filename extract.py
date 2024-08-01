@@ -1,3 +1,5 @@
+# TODO: Don't add texts with musical notes to json.
+
 import json
 import os
 from pathlib import Path

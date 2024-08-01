@@ -172,6 +172,7 @@ non_english.json
 milvus_compose/
 milvus-data/
 embeddings/
+test/
 search_algorithms/
 media/
 *.db

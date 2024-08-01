@@ -15,11 +15,11 @@ def get_movie_details(result, cursor, matched_text):
     cursor.execute(movie_query, (movie_id,))
     movie_name = cursor.fetchone()[0]
 
-    sub_query = "SELECT text, start, end FROM subtitles WHERE movie_id = ? AND text = ?"
+    sub_query = "SELECT start, end FROM subtitles WHERE movie_id = ? AND text = ?"
     cursor.execute(sub_query, (movie_id, matched_text))
-    movie_text, sub_start, sub_end = cursor.fetchone()
+    sub_start, sub_end = cursor.fetchone()
 
-    return matched_text, movie_name, movie_text, sub_start, sub_end
+    return matched_text, movie_name, sub_start, sub_end
 
 
 def get_best_match(cursor, user_input):
@@ -37,7 +37,7 @@ def get_best_match(cursor, user_input):
             for result in results:
                 if result[0] == matched_text:
                     return get_movie_details(result, cursor, matched_text)
-    return (None, None, None, None, None)
+    return (None, None, None, None)
 
 
 def main():
@@ -45,9 +45,10 @@ def main():
     cursor = conn.cursor()
 
     user_input = input("write... ")
-    best_text, movie_name, _, start, end = get_best_match(cursor, user_input)
+    best_text, movie_name, start, end = get_best_match(cursor, user_input)
 
     if best_text:
+        print(f"\n> {user_input}")
         print(f"Best matching text: {best_text}")
         print(f"Movie name: {movie_name}")
         print(f"Timestamp: {start} --> {end}")
@@ -58,4 +59,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    while True:
+        main()
