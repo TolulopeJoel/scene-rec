@@ -1,4 +1,5 @@
 # gets new movies from addicted, and update the movies json
+# TODO: add movie year, and genres
 import requests
 from bs4 import BeautifulSoup
 
