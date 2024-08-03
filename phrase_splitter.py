@@ -1,11 +1,29 @@
 import nltk
+from nltk.data import find
 from nltk.tag import pos_tag
 from nltk.tokenize import sent_tokenize, word_tokenize
 
-nltk.download("punkt")
-nltk.download("maxent_ne_chunker")
-nltk.download("words")
-nltk.download("averaged_perceptron_tagger")
+
+def download_nltk_data():
+    try:
+        find('tokenizers/punkt/')
+    except LookupError:
+        nltk.download('punkt')
+
+    try:
+        find('chunkers/maxent_ne_chunker/')
+    except LookupError:
+        nltk.download('maxent_ne_chunker')
+
+    try:
+        find('corpora/words/')
+    except LookupError:
+        nltk.download('words')
+
+    try:
+        find('taggers/averaged_perceptron_tagger.zip')
+    except LookupError:
+        nltk.download('averaged_perceptron_tagger')
 
 
 def split_into_phrases(text: str) -> list[str]:
@@ -52,3 +70,7 @@ def split_into_phrases(text: str) -> list[str]:
         all_phrases.extend(phrases)
 
     return all_phrases
+
+
+if __name__ == "__main__":
+    download_nltk_data()
