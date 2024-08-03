@@ -18,13 +18,17 @@ def get_movie_details(result, cursor):
     return matched_text, movie_name, sub_start, sub_end
 
 
-def fetch_subtitles(cursor, rinsed_text, limit=10):
+def fetch_subtitles(cursor, rinsed_text, limit=None):
     search_query = """
     SELECT text, movie_id, bm25(subtitles_fts) AS score 
-    FROM subtitles_fts WHERE text MATCH ?
-    ORDER BY score LIMIT ?
+    FROM subtitles_fts WHERE text MATCH ? ORDER BY score
     """
-    cursor.execute(search_query, (rinsed_text, limit))
+    if limit:
+        search_query += " LIMIT ?"
+        cursor.execute(search_query, (rinsed_text, limit))
+    else:
+        cursor.execute(search_query, (rinsed_text,))
+
     return cursor.fetchall()
 
 
