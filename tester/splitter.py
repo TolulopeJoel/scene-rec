@@ -1,10 +1,6 @@
-# TODO: first split by sentences, then by phrases
-
 import nltk
-from nltk.chunk import ne_chunk
-from nltk.corpus import stopwords
 from nltk.tag import pos_tag
-from nltk.tokenize import word_tokenize
+from nltk.tokenize import sent_tokenize, word_tokenize
 
 nltk.download("punkt")
 nltk.download("maxent_ne_chunker")
@@ -12,34 +8,47 @@ nltk.download("words")
 nltk.download("averaged_perceptron_tagger")
 
 
-def split_into_phrases(sentence):
-    words = word_tokenize(sentence)
-    # part of speech (pos) tagging
-    pos_tags = pos_tag(words)
+def split_into_phrases(text: str) -> list[str]:
+    """
+    Split the input text into phrases based 
+    on specific part-of-speech (POS) patterns.
+    """
+    # split into sentences, then further split by commas
+    sentences = [
+        sentence
+        for i in sent_tokenize(text)
+        for sentence in i.split(",")
+    ]
 
-    # split by conjunctions, prepositions and articles
-    phrases, phrase = [], []
+    all_phrases = []
+    for sentence in sentences:
+        words = word_tokenize(sentence)
+        pos_tags = pos_tag(words)  # POS tagging
 
-    for word, pos in pos_tags:
-        if pos in ["CC", "IN", "DT"] and phrase:
+        phrases, phrase = [], []
+        for index, (word, pos) in enumerate(pos_tags):
+            # check if current word is a pronoun and the next word is a verb
+            if pos == "PRP" and pos_tags[index + 1][1] == "VBZ":
+                # if the phrase has one word, add the pronoun and verb to the phrase
+                if len(phrase) == 1:
+                    phrase.append(word)
+                    phrase.append(pos_tags[index + 1][0])
+                # if the phrase has more than one word, complete the current phrase and start a new one
+                else:
+                    phrases.append(" ".join(phrase))
+                    phrase = [word, pos_tags[index + 1][0]]
+                # remove the processed verb to avoid reprocessing
+                pos_tags.pop(index + 1)
+            # if current word is a conjunction, number, determiner, etc., complete the current phrase
+            elif pos in {"CC", "CD", "DT", "LS", "VBZ", "MD", "TO"} and phrase:
+                phrases.append(" ".join(phrase))
+                phrase = [word]
+            else:
+                phrase.append(word)
+
+        if phrase:
             phrases.append(" ".join(phrase))
-            phrase = [word]
-        else:
-            phrase.append(word)
 
-    if phrase:
-        phrases.append(" ".join(phrase))
+        all_phrases.extend(phrases)
 
-    return phrases
-
-
-sentence = """
-Every great achievement starts with a single step. Whether you are facing a new challenge or pursuing a long-held dream, remember that progress is built one moment, one effort at a time. Embrace each step, learn from every experience, and do not be afraid of failure it is often the greatest teacher. Believe in your abilities, stay focused on your goals, and keep pushing forward. Your dedication and perseverance will lead you to success. The journey may be tough, but it is the courage to continue that counts. You have the power to achieve greatness. Keep going!
-"""
-phrases = split_into_phrases(sentence)
-print(phrases)
-
-
-# two part of speeches i need to looke out for:
-# adverb: RB
-# adjective: JJ
+    return all_phrases
