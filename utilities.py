@@ -33,6 +33,10 @@ def rinse_text(text: str) -> str:
     def remove_punctuation(text: str) -> str:
         return text.translate(str.maketrans("", "", string.punctuation))
 
+    def remove_caption_cues(text: str) -> str:
+        return re.sub(r"\[(.*?)\]|\((.*?)\)", "", text)
+
+    text = remove_caption_cues(text)
     text = remove_html_elements(text)
     text = expand_abbreviations(text)
     text = remove_punctuation(text)
