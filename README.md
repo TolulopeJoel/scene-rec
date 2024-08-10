@@ -1,7 +1,11 @@
-# movieEditor
+# Scene-Rec
 
-Movie Scene Clip Suggester is a python app that allows users to find and retrieve movie scenes based on specific phrases or sentences. The algorithm searches through subtitles and matches user inputs to complete sentences, even if the text spans multiple subtitles and movies.
+SceneRec is a tool that lets users search a vast database of movie subtitles to find scenes with specific lines of dialogue. By simplifying the process of locating and compiling movie clips, SceneRec saves time and effort for editors, content creators, and movie enthusiasts.
 
 ### Motivation
 
-This project is inspired by a [video](https://www.instagram.com/p/C8UYQkXR8Zd/) I watched on Instagram. I imagine how tedious it is for an editor to manually search for movie scenes with specific phrases and stitch them together. To save time and effort, this software allows users to type the dialogue they want, and it automatically recommends movie scenes clips for different phrases in the dialogue.
+The idea for this project was born from a moment of realization while watching a [video](https://www.instagram.com/p/C8UYQkXR8Zd/) on Instagram. I couldn't help but think about the huge effort it must have taken for the editor to find and stitch together movie scenes that matched specific phrases. 
+
+Manually filtering through countless films to find the right words is overwhelming and extremely time-consuming.
+
+This tool aims to make the creative process more efficient, enabling editors, content creators, and movie enthusiasts to bring their ideas to life with few keystrokes. In the future, the software can create a video from the default recommended scenes automatically.
