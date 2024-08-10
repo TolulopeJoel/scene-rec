@@ -1,3 +1,4 @@
+import re
 import sqlite3
 
 from utilities import load_json
@@ -9,7 +10,8 @@ subtitles_dataset = load_json("../media/subs/json/db.json")
 
 # Insert data into Movies and Subtitles tables
 for movie, subtitles in subtitles_dataset.items():
-    cursor.execute('INSERT INTO movies (name) VALUES (?)', (movie,))
+    year = int(match[1]) if (match := re.search(r'\((\d{4})\)', movie)) else None
+    cursor.execute('INSERT INTO movies (name, year) VALUES (?, ?)', (movie, year))
     movie_id = cursor.lastrowid
     print(f"{movie} ({movie_id}) loading to database ...")
 
