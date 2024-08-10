@@ -54,7 +54,7 @@ def srt_to_json(srt_file_path, json_file_path):
         for line in lines:
             line = line.strip()
 
-            if line.isdigit():
+            if line.isdigit() or ("♪" in line) or ("♫" in line):
                 # Skip the subtitle index (cue number) lines
                 continue
 

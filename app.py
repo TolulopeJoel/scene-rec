@@ -33,14 +33,13 @@ def get_subtitles():
         }), 400
 
     all_phrases = split_into_phrases(rinse_text(user_input))
-    results = []
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
+    results = []
     for phrase in all_phrases:
         phrase_matches = get_best_match(cursor, phrase, limit)
-
         phrase_result = {
             'phrase': phrase,
             'matches': [
