@@ -17,7 +17,7 @@ def get_db_connection():
     return conn
 
 
-@app.route('/matchs', methods=['POST'])
+@app.route('/search', methods=['POST'])
 def get_subtitles():
     data = request.get_json()
     user_input = data.get('text', '')
