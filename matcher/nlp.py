@@ -4,28 +4,6 @@ from nltk.tag import pos_tag
 from nltk.tokenize import sent_tokenize, word_tokenize
 
 
-def download_nltk_data():
-    try:
-        find('tokenizers/punkt/')
-    except LookupError:
-        nltk.download('punkt')
-
-    try:
-        find('chunkers/maxent_ne_chunker/')
-    except LookupError:
-        nltk.download('maxent_ne_chunker')
-
-    try:
-        find('corpora/words/')
-    except LookupError:
-        nltk.download('words')
-
-    try:
-        find('taggers/averaged_perceptron_tagger.zip')
-    except LookupError:
-        nltk.download('averaged_perceptron_tagger')
-
-
 def split_into_phrases(text: str) -> list[str]:
     """
     Split the input text into phrases based 
@@ -46,17 +24,16 @@ def split_into_phrases(text: str) -> list[str]:
         phrases, phrase = [], []
         for index, (word, pos) in enumerate(pos_tags):
             # check if current word is a pronoun and the next word is a verb
+            # if the phrase has one word, add the pronoun and verb to the phrase
             if pos == "PRP" and pos_tags[index + 1][1] == "VBZ":
-                # if the phrase has one word, add the pronoun and verb to the phrase
                 if len(phrase) == 1:
                     phrase.append(word)
                     phrase.append(pos_tags[index + 1][0])
-                # if the phrase has more than one word, complete the current phrase and start a new one
                 else:
                     phrases.append(" ".join(phrase))
                     phrase = [word, pos_tags[index + 1][0]]
-                # remove the processed verb to avoid reprocessing
                 pos_tags.pop(index + 1)
+
             # if current word is a conjunction, number, determiner, etc., complete the current phrase
             elif pos in {"CC", "CD", "DT", "LS", "VBZ", "MD", "TO"} and phrase:
                 phrases.append(" ".join(phrase))
@@ -70,6 +47,28 @@ def split_into_phrases(text: str) -> list[str]:
         all_phrases.extend(phrases)
 
     return all_phrases
+
+
+def download_nltk_data():
+    try:
+        find('tokenizers/punkt/')
+    except LookupError:
+        nltk.download('punkt')
+
+    try:
+        find('chunkers/maxent_ne_chunker/')
+    except LookupError:
+        nltk.download('maxent_ne_chunker')
+
+    try:
+        find('corpora/words/')
+    except LookupError:
+        nltk.download('words')
+
+    try:
+        find('taggers/averaged_perceptron_tagger.zip')
+    except LookupError:
+        nltk.download('averaged_perceptron_tagger')
 
 
 if __name__ == "__main__":

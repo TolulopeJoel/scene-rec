@@ -1,5 +1,3 @@
-# TODO: Don't add texts with musical notes to json.
-
 import json
 import os
 from pathlib import Path
@@ -8,15 +6,15 @@ from constants import (
     ORIGINAL_SUBS_DIR, JSON_FILE,
     EXTRACTED_SUBS_DIR, JSON_SUBS_DIR,
 )
-from utilities import rinse_text
+from utils import rinse_text
 
 
-def remove_file(file_path, downloaded_dict_path="./sources/downloaded.json"):
+def remove_file(file_path, downloaded_dict_path="./downloaded.json"):
     if os.path.exists(file_path):
         os.remove(file_path)
         print(f"Deleted file: {file_path}")
 
-    # Update the sources/downloaded.json dictionary
+    # Update the scraper/downloaded.json dictionary
     with open(downloaded_dict_path, "r+", encoding="utf-8") as json_file:
         downloaded_dict = json.load(json_file)
         filename = os.path.basename(file_path).replace(".srt", "").replace(".json", "")

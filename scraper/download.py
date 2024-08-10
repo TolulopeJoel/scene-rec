@@ -2,7 +2,7 @@ import requests
 from tqdm import tqdm
 
 from constants import ADDICTIVE_COOKIES, ADDICTIVE_HEADERS
-from utilities import load_json, save_json
+from utils import load_json, save_json
 
 
 def download_subtitle(title: str, sub_url: str, MOVIES) -> None:

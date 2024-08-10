@@ -3,9 +3,9 @@ import sqlite3
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
-from match import get_best_match
-from phrase_splitter import split_into_phrases
-from utilities import rinse_text
+from matcher.match import get_best_match
+from matcher.nlp import split_into_phrases
+from utils import rinse_text
 
 app = Flask(__name__)
 CORS(app, origins=["http://127.0.0.1:5500"])

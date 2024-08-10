@@ -1,10 +1,10 @@
 # gets new movies from addicted, and update the movies json
-# TODO: add movie year, and genres
+# TODO: add movie genres
 import requests
 from bs4 import BeautifulSoup
 
 from constants import ADDICTIVE_BASE_URL, ADDICTIVE_COOKIES, ADDICTIVE_HEADERS
-from utilities import load_json, save_json
+from utils import load_json, save_json
 
 
 def is_ascii(title: str) -> bool:

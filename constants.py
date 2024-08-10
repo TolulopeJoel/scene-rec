@@ -8,7 +8,7 @@ load_dotenv()
 JSON_SUBS_DIR = Path("./media/subs/json")
 ORIGINAL_SUBS_DIR = Path("./media/subs/originals")
 EXTRACTED_SUBS_DIR = Path("./media/subs/extracted")
-JSON_FILE = JSON_SUBS_DIR / "db.json"
+JSON_FILE = Path("./media/subs/db.json")
 
 ABBREVIATIONS = {
     "i'll": "i will",
