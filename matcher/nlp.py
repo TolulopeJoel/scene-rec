@@ -25,7 +25,7 @@ def split_into_phrases(text: str) -> list[str]:
         for index, (word, pos) in enumerate(pos_tags):
             # check if current word is a pronoun and the next word is a verb
             # if the phrase has one word, add the pronoun and verb to the phrase
-            if pos == "PRP" and pos_tags[index + 1][1] == "VBZ":
+            if index + 1 < len(pos_tags) and pos == "PRP" and pos_tags[index + 1][1] == "VBZ":
                 if len(phrase) == 1:
                     phrase.append(word)
                     phrase.append(pos_tags[index + 1][0])
@@ -46,7 +46,8 @@ def split_into_phrases(text: str) -> list[str]:
 
         all_phrases.extend(phrases)
 
-    return all_phrases
+    # remove empty strings from list
+    return [phrase for phrase in all_phrases if phrase]
 
 
 def download_nltk_data():
