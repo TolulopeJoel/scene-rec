@@ -2,7 +2,7 @@
 
 ## Project Description
 
-SceneRec is a tool that lets users get movie clip recommendations for phrases or sentences. It intelligently matches user inputs to complete sentences spoken in various movie scenes. SceneRec saves time and effort for editors, content creators, and video enthusiasts.
+SceneRec is an NLP (Natural Language Processing) tool that lets users get movie clip recommendations for phrases or sentences. It intelligently matches user inputs to complete sentences spoken in various movie scenes. SceneRec saves time and effort for editors, content creators, and video enthusiasts.
 
 ## Motivation
 
