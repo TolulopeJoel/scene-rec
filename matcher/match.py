@@ -17,11 +17,12 @@ def fetch_subtitles(cursor, rinsed_text, limit=None):
     SELECT text, movie_id, bm25(subtitles_fts) AS score 
     FROM subtitles_fts WHERE text MATCH ? ORDER BY score
     """
-    if limit:
-        search_query += " LIMIT ?"
-        cursor.execute(search_query, (rinsed_text, limit))
-    else:
-        cursor.execute(search_query, (rinsed_text,))
+    if rinsed_text:
+        if limit:
+            search_query += " LIMIT ?"
+            cursor.execute(search_query, (rinsed_text, limit))
+        else:
+            cursor.execute(search_query, (rinsed_text,))
 
     return cursor.fetchall()
 
