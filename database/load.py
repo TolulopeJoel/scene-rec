@@ -6,7 +6,7 @@ from utils import load_json
 conn = sqlite3.connect('../subtitles.db')
 cursor = conn.cursor()
 
-subtitles_dataset = load_json("../media/subs/db.json")
+subtitles_dataset = load_json("../db.json")
 
 # Insert data into Movies and Subtitles tables
 for movie, subtitles in subtitles_dataset.items():
