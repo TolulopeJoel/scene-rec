@@ -1,4 +1,4 @@
-# Scene-Rec
+# SceneRec
 
 ## Project Description
 
@@ -13,64 +13,59 @@ Manually filtering through countless films to find the right words is overwhelmi
 This tool aims to make the creative process more efficient, enabling editors, content creators, and video enthusiasts to bring their ideas to life with few keystrokes. In the future, the software will be able to create a video from the default recommended scenes automatically.
 
 
+## Features
+
+- Efficient phrase-to-scene matching
+- Support for multiple movies and TV shows
+- Customizable search results
+- API for easy integration into existing workflows
+
 ## Installation
 
 1. **Clone the Repository**:
-    ```bash
-    git clone https://github.com/tolulopejoel/scene-rec.git
-    ```
-2. **Navigate to the Project Directory**:
-    ```bash
-    cd scene-rec
-    ```
-3. **Create and Activate a Virtual Environment**:
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-    ```
-4. **Install Dependencies**:
-    ```bash
-    pip install -r requirements.txt
-    ```
+   ```bash
+   git clone https://github.com/tolulopejoel/scene-rec.git
+   cd scene-rec
+   ```
+
+2. **Set Up the Environment**:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+   pip install -r requirements.txt
+   ```
 
 
 ## Usage
 
-1. **Get Subtitles**:
-    - **Option 1: Download Pre-Filled Subtitles Database**  
-      Download the pre-filled json file [db.json](https://drive.google.com/file/d/1swANoP9PdFRrCLuzkWM9PSy0q7JWbzzD/view?usp=drivesdk) from the provided link and place it in the root directory of the project, the run:
-      ```bash
-      cd ../database
-      ```
-      ```bash
-      python schema.py
-      ```
-      ```bash
-      python load.py
-      ```
-      
-    - **Option 2: Scrape Subtitles**  
-      If you prefer to scrape subtitles from your own sources, scrape into `media/subs/originals`, then run the `extract.py` script to clean subtitles and extract to json.
-      ```bash
-      cd scraper
-      ```
-      ```bash
-      python extract.py
-      ```
-      ```bash
-      cd ../database
-      ```
-      ```bash
-      python schema.py
-      ```
-      ```bash
-      python load.py
-      ```
-2. **Run the API**:
-    ```bash
-    python api.py
-    ```
-3. **Access the API**:
+1. **Prepare Subtitles Database**:
+   
+   Option A: Download Pre-Filled Subtitles JSON File
+   - Download [db.json](https://drive.google.com/file/d/1swANoP9PdFRrCLuzkWM9PSy0q7JWbzzD/view?usp=drivesdk) and place it in the project root.
+   - Run the following commands:
+     ```bash
+     cd database
+     python schema.py
+     python load.py
+     ```
+
+   Option B: Scrape Your Own Subtitles
+   - Scrape subtitles from your own sources, then place subtitle files in `media/subs/originals`
+   - Run the following commands:
+     ```bash
+     cd scraper
+     python extract.py
+     cd ../database
+     python schema.py
+     python load.py
+     ```
+
+2. **Start the API**:
+   ```bash
+   python api.py
+   ```
+
+3. **Use the API**:
    The API will be available at `http://127.0.0.1:5000/`.
 
 
