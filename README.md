@@ -74,16 +74,16 @@ This tool aims to make the creative process more efficient, enabling editors, co
 #### `/search` (POST)
 Search for movie clips by providing a phrase or sentence.
 
-    **Request Body**:
-    ```json
+**Request Body**:
+```json
     {
         "text": "wait till i can do anything",
         "limit": 3
     }
-    ```
+```
 
-    **Response**:
-    ```json
+**Response**:
+```json
     {
         "phrases": 2,
         "results": [
@@ -135,7 +135,7 @@ Search for movie clips by providing a phrase or sentence.
             }
         ]
     }
-    ```
+```
 
 
 ## Future Enhancements
