@@ -38,7 +38,16 @@ This tool aims to make the creative process more efficient, enabling editors, co
 
 1. **Get Subtitles**:
     - **Option 1: Download Pre-Filled Subtitles Database**  
-      Download the pre-filled SQLite database file [subtitles.db](https://example.com/wait-till-i-upload-from-g_drive) from the provided link and place it in the root directory of the project.
+      Download the pre-filled json file [db.json](https://drive.google.com/file/d/1swANoP9PdFRrCLuzkWM9PSy0q7JWbzzD/view?usp=drivesdk) from the provided link and place it in the root directory of the project, the run:
+      ```bash
+      cd ../database
+      ```
+      ```bash
+      python schema.py
+      ```
+      ```bash
+      python load.py
+      ```
       
     - **Option 2: Scrape Subtitles**  
       If you prefer to scrape subtitles from your own sources, scrape into `media/subs/originals`, then run the `extract.py` script to clean subtitles and extract to json.
