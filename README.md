@@ -69,7 +69,10 @@ This tool aims to make the creative process more efficient, enabling editors, co
    The API will be available at `http://127.0.0.1:5000/`.
 
 
-4. **`/search`** (POST): Search for movie clips by providing a phrase or sentence.
+### API Endpoints
+
+#### `/search` (POST)
+Search for movie clips by providing a phrase or sentence.
 
     **Request Body**:
     ```json
@@ -134,9 +137,24 @@ This tool aims to make the creative process more efficient, enabling editors, co
     }
     ```
 
+
+## Future Enhancements
+
+- Automatic video creation from recommended scenes
+- Support for more languages and subtitle formats
+- Integration with popular video editing software
+
+
 ## Contributing
 
-Contributions are welcome! If you'd like to contribute, please fork the repository and submit a pull request.
+Contributions are welcome! Please follow these steps to contribute:
+
+1. Fork the repository
+2. Create a new branch: `git checkout -b feat-branch-name`
+3. Make your changes and commit them: `git commit -m 'Update some feature'`
+4. Push to the branch: `git push origin feat-branch-name`
+5. Submit a pull request
+
 
 ## License
 
