@@ -28,11 +28,12 @@ def get_subtitles():
             'error': 'Expected a non-empty "text" field in the request data.',
             'expected': {
                 'text': 'string',
-                'limit': 'integer (optional, default: 5)'
+                'limit': 'integer (optional, default: 5)',
+                'matches': 'list (optional)'
             }
         }), 400
 
-    all_phrases = split_into_phrases(rinse_text(user_input))
+    all_phrases = data.get('matches') or split_into_phrases(rinse_text(user_input))
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -60,6 +61,7 @@ def get_subtitles():
 
     response = {
         'phrases': len(all_phrases),
+        "phrases_list": all_phrases,
         'results': results
     }
 
@@ -67,4 +69,4 @@ def get_subtitles():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5000)
