@@ -47,6 +47,8 @@ This tool aims to make the creative process more efficient, enabling editors, co
      cd database
      python schema.py
      python load.py
+     cd matcher
+     python nlp.py
      ```
 
    Option B: Scrape Your Own Subtitles
@@ -58,6 +60,8 @@ This tool aims to make the creative process more efficient, enabling editors, co
      cd ../database
      python schema.py
      python load.py
+     cd matcher
+     python nlp.py
      ```
 
 2. **Start the API**:
