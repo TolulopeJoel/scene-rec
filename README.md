@@ -44,11 +44,7 @@ This tool aims to make the creative process more efficient, enabling editors, co
    - Download [db.json](https://drive.google.com/file/d/1swANoP9PdFRrCLuzkWM9PSy0q7JWbzzD/view?usp=drivesdk) and place it in the project root.
    - Run the following commands:
      ```bash
-     cd database
-     python schema.py
-     python load.py
-     cd matcher
-     python nlp.py
+     python setup.py
      ```
 
    Option B: Scrape Your Own Subtitles
@@ -57,11 +53,8 @@ This tool aims to make the creative process more efficient, enabling editors, co
      ```bash
      cd scraper
      python extract.py
-     cd ../database
-     python schema.py
-     python load.py
-     cd matcher
-     python nlp.py
+     cd ..
+     python setup.py
      ```
 
 2. **Start the API**:
