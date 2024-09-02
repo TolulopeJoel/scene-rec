@@ -165,14 +165,5 @@ cython_debug/
 #.idea/
 
 
-downloaded.json
-movies.json
-non_english.json
-
-milvus_compose/
-milvus-data/
-embeddings/
-test/
-search_algorithms/
-media/
+*.json
 *.db

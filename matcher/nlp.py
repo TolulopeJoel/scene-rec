@@ -51,6 +51,7 @@ def split_into_phrases(text: str) -> list[str]:
 
 
 def download_nltk_data():
+    print("downloading required ML data...")
     try:
         find('tokenizers/punkt/')
     except LookupError:
@@ -70,6 +71,7 @@ def download_nltk_data():
         find('taggers/averaged_perceptron_tagger.zip')
     except LookupError:
         nltk.download('averaged_perceptron_tagger')
+    print("downloading required ML data...done ✅")
 
 
 if __name__ == "__main__":
